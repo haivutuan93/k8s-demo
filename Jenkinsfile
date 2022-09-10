@@ -1,36 +1,32 @@
-pipeline {
-    agent any
-
-    stages {
-        stage('Init') {
-            steps {
-                echo 'Initializing..'
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-            }
+node {
+  def image
+   //1//  
+   stage ('checkout') {
+        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/haivutuan93/k8s-demo.git']]])      
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-                echo 'Running pytest..'
-            }
+   
+ //2//   
+    stage ('Build') {
+         def mvnHome = tool name: 'maven', type: 'maven'
+         def mvnCMD = "${mvnHome}/bin/mvn"
+         sh "${mvnCMD} clean package"           
         }
-        stage('Build') {
-            steps {
-                echo 'Building..'
-                echo 'Running docker build -t sntshk/cotu .'
-            }
+       
+       
+   //3// 
+   stage ('Docker Build') {
+         
+            docker.build('demo')
         }
-        stage('Publish') {
-            steps {
-                echo 'Publishing..'
-                echo 'Running docker push..'
-            }
-        }
-        stage('Cleanup') {
-            steps {
-                echo 'Cleaning..'
-                echo 'Running docker rmi..'
-            }
-        }
+//4// 
+    stage ('Docker push')
+    docker.withRegistry('https://121152775641.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:121152775641') {
+    docker.image('demo').push('latest')
     }
+    
+  
+ //5// 
+    stage ('K8S Deploy'){
+                    sh 'kubectl apply -f spring-boot.yaml'
+      } 
 }
