@@ -26,6 +26,6 @@ node {
 
     //5//
     stage ('K8S Deploy'){
-        sh 'kubectl apply -f spring-boot.yaml'
+        docker.image('demo').withRun('-p 8000:8080 -d')
     }
 }
