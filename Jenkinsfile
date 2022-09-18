@@ -26,6 +26,7 @@ node {
 
     //5//
     stage ('K8S Deploy'){
-        docker.image('demo').withRun('-p 8000:8080 -d')
+        docker run hello-world
+//         docker.image('demo').withRun('-p 8000:8080 -d')
     }
 }
