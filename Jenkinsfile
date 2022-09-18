@@ -27,6 +27,8 @@ node {
   
  //5// 
     stage ('K8S Deploy'){
-                    sh 'kubectl apply -f spring-boot.yaml'
+//         ssh -i "InstanceMacb.pem" ec2-user@ec2-54-173-62-36.compute-1.amazonaws.com
+        docker stop "6aaa1e1793b5"
+//                     sh 'kubectl apply -f spring-boot.yaml'
       } 
 }
